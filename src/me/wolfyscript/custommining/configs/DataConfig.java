@@ -3,7 +3,6 @@ package me.wolfyscript.custommining.configs;
 import me.wolfyscript.utilities.api.config.Config;
 import me.wolfyscript.utilities.api.config.ConfigAPI;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -45,7 +44,7 @@ public class DataConfig extends Config {
         if(getConfig().getConfigurationSection("items") != null){
             Set<String> keys = getConfig().getConfigurationSection("items").getKeys(false);
             for(String key : keys){
-                ItemStack itemStack = getItem("items."+key);
+                ItemStack itemStack = getItem("items."+key+".item");
                 itemMap.put(key, itemStack);
             }
             if(getConfig().getConfigurationSection("blocks") != null){
@@ -54,7 +53,7 @@ public class DataConfig extends Config {
                     Material material = Material.matchMaterial(matKey);
                     if(material != null){
                         List<ItemStack> items = new ArrayList<>();
-                        List<String> itemNames = getStringList("blocks."+matKey);
+                        List<String> itemNames = getStringList("blocks."+matKey+".items");
                         for(String itemName : itemNames){
                             ItemStack itemStack = itemMap.getOrDefault(itemName, null);
                             if(itemStack != null){
@@ -82,12 +81,12 @@ public class DataConfig extends Config {
                 }
                 itemNames.add("item"+items.indexOf(matItem));
             }
-            set(material.name().toLowerCase(Locale.ROOT), itemNames);
+            set(material.name().toLowerCase(Locale.ROOT)+".items", itemNames);
         }
         for (int i = 0; i < items.size(); i++) {
             ItemStack item = items.get(i);
             String key = "item"+i;
-            saveItem("items."+key, item);
+            saveItem("items."+key+".item", item);
         }
     }
 }

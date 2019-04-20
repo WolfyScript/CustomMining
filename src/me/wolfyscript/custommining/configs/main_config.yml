@@ -1,0 +1,4 @@
+#break cooldown in ticks
+cooldown:
+  enable: true
+  value: 0

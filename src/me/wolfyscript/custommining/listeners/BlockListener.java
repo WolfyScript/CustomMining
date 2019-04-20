@@ -2,64 +2,61 @@ package me.wolfyscript.custommining.listeners;
 
 import me.wolfyscript.custommining.CustomMining;
 import me.wolfyscript.custommining.configs.DataConfig;
+import me.wolfyscript.custommining.configs.MainConfig;
 import me.wolfyscript.custommining.handlers.ConfigHandler;
-import net.md_5.bungee.api.ChatColor;
+import me.wolfyscript.utilities.api.WolfyUtilities;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class BlockListener implements Listener {
 
-    @EventHandler
-    public void onBreak(BlockBreakEvent event){
-        ConfigHandler configHandler = CustomMining.getConfigHandler();
-        DataConfig dataConfig = configHandler.getDataConfig();
-        HashMap<Material, List<ItemStack>> destroys = dataConfig.getDestroysMap();
+    private ArrayList<UUID> cooldowns;
 
-        Block block = event.getBlock();
+    public BlockListener() {
+        cooldowns = new ArrayList<>();
+    }
+
+    @EventHandler
+    public void onBreak(BlockBreakEvent event) {
+        ConfigHandler configHandler = CustomMining.getConfigHandler();
+        long cooldown = configHandler.getMainConfig().getCooldown();
+        HashMap<Material, List<ItemStack>> destroys = configHandler.getDataConfig().getDestroysMap();
+
+        Material type = event.getBlock().getType();
         Player player = event.getPlayer();
         ItemStack holdItem = player.getInventory().getItemInMainHand();
 
-        if(destroys.containsKey(block.getType())){
-            event.setDropItems(false);
-            List<ItemStack> items = destroys.get(block.getType());
-            for (ItemStack item : items) {
-                if(holdItem.isSimilar(item)){
-                    player.sendMessage("Broke");
-                    event.setDropItems(true);
-                    event.setCancelled(false);
-                    return;
+        if (destroys.containsKey(type)) {
+            if (!cooldowns.contains(player.getUniqueId())) {
+                event.setDropItems(false);
+                List<ItemStack> items = destroys.get(type);
+                for (ItemStack item : items) {
+                    if (holdItem.isSimilar(item)) {
+                        UUID uuid = player.getUniqueId();
+                        cooldowns.add(uuid);
+                        if (configHandler.getMainConfig().isCooldown()) {
+                            Bukkit.getScheduler().runTaskLaterAsynchronously(CustomMining.getInstance(), () -> cooldowns.remove(uuid), cooldown);
+                        }
+                        event.setDropItems(true);
+                        event.setCancelled(false);
+                        break;
+                    }
                 }
+            } else {
+                player.sendMessage("§cYou need to wait §4" + (cooldown / 20) + "s §cbefore breaking the next block!");
+                event.setCancelled(true);
             }
-
         }
     }
-
-    @EventHandler
-    public void onDamage(BlockDamageEvent event){
-
-
-
-    }
-
-    @EventHandler
-    public void onInteract(PlayerInteractEvent event){
-        if(event.getAction().equals(Action.LEFT_CLICK_BLOCK)){
-
-        }
-    }
-
-
 }

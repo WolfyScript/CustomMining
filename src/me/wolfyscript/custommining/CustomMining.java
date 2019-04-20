@@ -22,19 +22,19 @@ public class CustomMining extends JavaPlugin {
         api.setCONSOLE_PREFIX("&7[&cCM&7] ");
         api.setCHAT_PREFIX("&7[&cCM&7] ");
 
+        configHandler = new ConfigHandler(api);
+        configHandler.load();
+
         Bukkit.getPluginManager().registerEvents(new BlockListener(), instance);
 
-        CommandCM commandCM = new CommandCM();
+        CommandCM commandCM = new CommandCM(configHandler);
         Bukkit.getPluginCommand("cm").setExecutor(commandCM);
         Bukkit.getPluginCommand("cm").setTabCompleter(commandCM);
 
-        configHandler = new ConfigHandler(api);
-        configHandler.load();
+
     }
 
     public void onDisable() {
-
-
         configHandler.save();
     }
 
