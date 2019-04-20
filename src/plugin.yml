@@ -1,0 +1,9 @@
+name: CustomMining
+main: me.wolfyscript.custommining.CustomMining
+version: 0.0.1
+api-version: 1.13
+
+commands:
+  cm:
+    usage: /cm <label>
+    description: the main command
