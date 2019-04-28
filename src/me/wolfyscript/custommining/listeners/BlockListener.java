@@ -1,13 +1,9 @@
 package me.wolfyscript.custommining.listeners;
 
 import me.wolfyscript.custommining.CustomMining;
-import me.wolfyscript.custommining.configs.DataConfig;
-import me.wolfyscript.custommining.configs.MainConfig;
 import me.wolfyscript.custommining.handlers.ConfigHandler;
-import me.wolfyscript.utilities.api.WolfyUtilities;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -44,8 +40,8 @@ public class BlockListener implements Listener {
                 for (ItemStack item : items) {
                     if (holdItem.isSimilar(item)) {
                         UUID uuid = player.getUniqueId();
-                        cooldowns.add(uuid);
                         if (configHandler.getMainConfig().isCooldown()) {
+                            cooldowns.add(uuid);
                             Bukkit.getScheduler().runTaskLaterAsynchronously(CustomMining.getInstance(), () -> cooldowns.remove(uuid), cooldown);
                         }
                         event.setDropItems(true);
